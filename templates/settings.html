@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="settings-container">
+    <h2 style="margin-bottom: 2rem;"><i class="fas fa-cog"></i> <span data-i18n="settings_title">System Settings</span>
+    </h2>
+
+    <form action="{{ url_for('save_settings') }}" method="POST">
+        <div class="settings-grid-layout">
+            <!-- Sidebar Navigation -->
+            <div class="settings-sidebar">
+                <a href="#profile" class="settings-nav-item active" onclick="switchSettingsTab(this, 'profile')">
+                    <i class="fas fa-id-card"></i> <span>Profile & Identity</span>
+                </a>
+                <a href="#engine" class="settings-nav-item" onclick="switchSettingsTab(this, 'engine')">
+                    <i class="fas fa-microchip"></i> <span>Neural Engine</span>
+                </a>
+                <a href="#comms" class="settings-nav-item" onclick="switchSettingsTab(this, 'comms')">
+                    <i class="fas fa-bell"></i> <span>Communications</span>
+                </a>
+                <a href="#security" class="settings-nav-item" onclick="switchSettingsTab(this, 'security')">
+                    <i class="fas fa-shield-alt"></i> <span>Security & Data</span>
+                </a>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="settings-content-area">
+                <!-- Profile Section -->
+                <div id="settings-profile" class="premium-card">
+                    <h3 style="margin-bottom: 0.5rem;"><i class="fas fa-user-circle"></i> Profile & Identity</h3>
+                    <p class="settings-header-desc">Manage how you appear within the BINIFY ecosystem.</p>
+
+                    <div class="setting-row" style="flex-direction: column; align-items: flex-start; gap: 1.5rem;">
+                        <div class="setting-info">
+                            <h4>System Avatar</h4>
+                            <p>Select your visual identity for logs and reports.</p>
+                        </div>
+                        <div class="avatar-selector">
+                            {% set avatars = ['fas fa-user-tie', 'fas fa-user-astronaut', 'fas fa-user-ninja', 'fas fa-user-secret', 'fas fa-user-shield'] %}
+                            {% for icon in avatars %}
+                            <button type="button" class="avatar-btn {{ 'selected' if (settings and settings.avatar_url == icon) or (not settings and icon == 'fas fa-user-tie') }}" 
+                                    onclick="selectPremiumAvatar(this, '{{ icon }}')">
+                                <i class="{{ icon }}"></i>
+                            </button>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="avatar_url" id="premium_avatar_input" value="{{ settings.avatar_url if settings else 'fas fa-user-tie' }}">
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <h4>Display Name</h4>
+                            <p>Your name as shown in system activity.</p>
+                        </div>
+                        <div style="width: 300px;">
+                            <input type="text" name="user_name" class="premium-input"
+                                value="{{ current_user.username if current_user.is_authenticated else (settings.full_name if settings else 'Binify Operator') }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Neural Engine Section -->
+                <div id="settings-engine" class="premium-card" style="display: none;">
+                    <h3 style="margin-bottom: 0.5rem;"><i class="fas fa-bolt"></i> Neural Engine Preferences</h3>
+                    <p class="settings-header-desc">Fine-tune the computer vision and AI processing parameters.</p>
+
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <h4>Inference Sensitivity</h4>
+                            <p>Higher values reduce false positives but may miss some items.</p>
+                        </div>
+                        <div style="width: 300px; display: flex; align-items: center; gap: 1.5rem;">
+                            <input type="range" name="ai_threshold" min="50" max="99"
+                                value="{{ settings.ai_threshold if settings else 85 }}"
+                                style="flex: 1; accent-color: var(--primary);"
+                                oninput="this.nextElementSibling.innerText = this.value + '%'">
+                            <span style="font-weight: 800; font-size: 1.1rem; color: var(--primary); width: 50px;">{{ settings.ai_threshold if settings else 85 }}%</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <h4>Hardware Node</h4>
+                            <p>Select the primary vision sensor for scanning.</p>
+                        </div>
+                        <div style="width: 300px;">
+                            <select name="camera_source" class="premium-input">
+                                <option value="webcam_0" {{ 'selected' if settings and settings.camera_source=='webcam_0' }}>Integrated Vision Sensor</option>
+                                <option value="usb_camera_1" {{ 'selected' if settings and settings.camera_source=='usb_camera_1' }}>External Array Probe</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Communications Section -->
+                <div id="settings-comms" class="premium-card" style="display: none;">
+                    <h3 style="margin-bottom: 0.5rem;"><i class="fas fa-bell"></i> Communication Channels</h3>
+                    <p class="settings-header-desc">Configure how the system alerts you and other operators.</p>
+
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <h4>Auditory Feedback</h4>
+                            <p>Receive sound cues for successful scans and system alerts.</p>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="audio_alerts" {{ 'checked' if not settings or settings.audio_alerts }} class="ui-switch">
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <h4>Push Intelligence</h4>
+                            <p>Send real-time notifications to your browser and devices.</p>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="push_notifs" checked class="ui-switch">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Section -->
+                <div id="settings-security" class="premium-card" style="display: none;">
+                    <h3 style="margin-bottom: 0.5rem; color: #ef4444;"><i class="fas fa-shield-alt"></i> Security & Data</h3>
+                    <p class="settings-header-desc">Manage your data footprint and system integrity.</p>
+
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <h4>Data Retention</h4>
+                            <p>Purge local scan history and environmental impact logs.</p>
+                        </div>
+                        <button type="button" onclick="clearHistory()" class="btn-cta" style="background: #ef4444; border-radius: 12px; font-size: 0.85rem;">
+                            <i class="fas fa-trash-alt"></i> Purge Data
+                        </button>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 1.5rem; margin-top: 1rem;">
+                    <button type="button" onclick="window.location.href='/dashboard'" class="btn-cta" style="background: transparent; color: var(--text-muted); box-shadow: none;">Cancel</button>
+                    <button type="submit" class="btn-cta" style="padding: 1rem 4rem; font-size: 1.1rem; border-radius: 15px;">Commit Changes</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function switchSettingsTab(el, tabId) {
+        if (window.event) window.event.preventDefault();
+        // Update Nav
+        document.querySelectorAll('.settings-nav-item').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+
+        // Update Content
+        document.querySelectorAll('.premium-card').forEach(card => card.style.display = 'none');
+        document.getElementById('settings-' + tabId).style.display = 'block';
+    }
+
+    function selectPremiumAvatar(btn, iconClass) {
+        document.querySelectorAll('.avatar-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.getElementById('premium_avatar_input').value = iconClass;
+        showToast("Avatar personality updated", "info");
+    }
+</script>
+{% endblock %}

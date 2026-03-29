@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h2 style="font-size: 2.5rem; margin-bottom: 2rem;"><i class="fas fa-history"></i> <span
+            data-i18n="history_title">History / Logs</span></h2>
+
+    <div class="glass" style="padding: 2rem;">
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 1rem;">
+            <h3 data-i18n="recent_logs">Recent Segregation Logs</h3>
+            <div style="display: flex; gap: 0.8rem;">
+                <button class="btn-cta" style="padding: 0.5rem 1rem; background: #ef4444;" onclick="clearHistory()"><i
+                        class="fas fa-trash-alt"></i>
+                    <span>Clear History</span></button>
+                <button class="btn-cta" style="padding: 0.5rem 1rem;" onclick="exportCSV()"><i
+                        class="fas fa-download"></i>
+                    <span data-i18n="export_logs">Export Logs</span></button>
+            </div>
+        </div>
+
+        <div class="data-table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th data-i18n="col_date">Date</th>
+                        <th data-i18n="col_time">Time</th>
+                        <th data-i18n="col_type">Waste Type</th>
+                        <th data-i18n="col_conf">Confidence</th>
+                        <th data-i18n="col_bin">Bin Assignment</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body">
+                    {% for log in logs %}
+                    <tr>
+                        <td>{{ log.timestamp.strftime('%b %d, %Y') }}</td>
+                        <td>{{ log.timestamp.strftime('%I:%M %p') }}</td>
+                        <td>
+                            <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--primary);">
+                                {{ log.category }}
+                            </span>
+                        </td>
+                        <td><strong>{{ log.confidence }}%</strong></td>
+                        <td><i class="fas fa-trash-alt"></i> {{ log.disposal_bin }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);"
+                            data-i18n="no_records">No records found.
+                            Start scanning to see history!</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

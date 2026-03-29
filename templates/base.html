@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BINIFY | AI-Powered Enterprise Waste OS</title>
+    <meta name="description" content="BINIFY is a next-generation waste intelligence platform using AI and computer vision to optimize recycling and environmental impact scan-by-scan.">
+    <meta name="keywords" content="AI recycling, waste management, computer vision waste, green tech, circular economy">
+    <meta name="author" content="BINIFY Intelligence Systems">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://binify.ai/">
+    <meta property="og:title" content="BINIFY | The Future of Waste Intelligence">
+    <meta property="og:description" content="Empowering cities with high-precision computer vision for real-time waste sorting and optimization.">
+    <meta property="og:image" content="{{ url_for('static', filename='images/hero_tech.png') }}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://binify.ai/">
+    <meta property="twitter:title" content="BINIFY | AI-Powered Enterprise Waste OS">
+    <meta property="twitter:description" content="Identify, sort, and optimize your ecological footprint in real-time with BINIFY Computer Vision.">
+    <meta property="twitter:image" content="{{ url_for('static', filename='images/hero_tech.png') }}">
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "BINIFY",
+      "operatingSystem": "Web",
+      "applicationCategory": "BusinessApplication",
+      "description": "AI-Driven Waste Management and Recycling Optimization Platform.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#10b981">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2104/2104595.png">
+</head>
+
+<body>
+    <div id="preloader">
+        <div class="loader-content">
+            <div class="loader-circle"></div>
+            <div class="loader-logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BINIFY Logo" class="logo-img">
+                BINIFY<span style="color: var(--primary);">.</span>
+            </div>
+            <div class="loader-progress">
+                <div class="loader-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="nav-top" style="justify-content: space-between;">
+                <a href="{{ url_for('index') }}" class="logo" style="text-decoration: none; font-size: 1.8rem;">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BINIFY Logo" class="logo-img">
+                    BINIFY<span style="color: var(--primary);">.</span>
+                </a>
+                <div class="nav-links desktop-only" style="display: flex; gap: 3rem; align-items: center;">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('dashboard') }}" class="btn-cta" style="padding: 0.6rem 1.5rem; box-shadow: none;">OS Portal</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" style="font-weight: 700;">Login</a>
+                        <a href="{{ url_for('register') }}" class="btn-cta" style="padding: 0.6rem 1.5rem; box-shadow: none;">Get Started</a>
+                    {% endif %}
+                </div>
+                <button class="mobile-toggle" id="mobile-menu-btn" aria-label="Toggle Navigation Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div class="nav-bottom" style="border-top: 1px solid rgba(0,0,0,0.05);">
+                <div class="nav-links" role="menubar">
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" role="menuitem"><i class="fas fa-th-large"></i> Dashboard</a>
+                    <a href="{{ url_for('detect') }}" role="menuitem"><i class="fas fa-search"></i> Scanner</a>
+                    <a href="{{ url_for('history') }}" role="menuitem"><i class="fas fa-history"></i> History</a>
+                    {% endif %}
+                </div>
+                <div class="ui-controls" role="group" aria-label="Interface Controls">
+                    <!-- Notification Dropdown -->
+                    <div class="notification-wrapper">
+                        <button class="nav-control-btn" id="notification-trigger" title="System Notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notif-badge" style="display: none;">0</span>
+                        </button>
+                        <div class="notification-dropdown glass" id="notif-dropdown">
+                            <div class="notif-header">
+                                <h3>Notifications</h3>
+                                <button onclick="clearAllNotifications()" class="clear-all-btn">Clear All</button>
+                            </div>
+                            <div class="notif-body" id="notif-items-list">
+                                <div class="notif-empty-state">
+                                    <i class="fas fa-bell-slash"></i>
+                                    <p>Your system is quiet. No new alerts.</p>
+                                </div>
+                            </div>
+                            <div class="notif-footer">
+                                <a href="{{ url_for('history') }}">View Complete Activity Log</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="theme-toggle ui-bg-subtle" onclick="toggleTheme()" title="Toggle Theme" style="border-radius: 10px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: none;">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <select class="lang-select ui-bg-subtle" onchange="changeLanguage(this.value)" style="border: none; padding: 0.5rem 1rem; border-radius: 10px; font-weight: 700;">
+                        <option value="en">EN</option>
+                        <option value="hi">HI</option>
+                        <option value="or">OR</option>
+                        <option value="pa">PA</option>
+                        <option value="te">TE</option>
+                    </select>
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('settings') }}" class="nav-settings-link" title="Settings"><i class="fas fa-cog"></i></a>
+                    <a href="{{ url_for('logout') }}" class="nav-settings-link" title="Logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <a href="/" class="footer-logo">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BINIFY Logo" class="logo-img"> BINIFY<span>.</span>
+                    </a>
+                    <p class="footer-desc">
+                        Next-generation waste intelligence platform powered by advanced computer vision and edge computing.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h4 class="footer-title">Platform</h4>
+                    <ul class="footer-links">
+                        <li><a href="/dashboard">OS Portal</a></li>
+                        <li><a href="/detect">Live Scanner</a></li>
+                        <li><a href="/history">Impact Logs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4 class="footer-title">Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="#vision">Vision</a></li>
+                        <li><a href="#">Security</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4 class="footer-title">Status</h4>
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--primary); font-weight: 700; font-size: 0.8rem; text-transform: uppercase;">
+                            <span class="status-dot active"></span> v4.2 Secure
+                        </div>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Global Infrastructure is Operational.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p>&copy; 2026 BINIFY Intelligence Systems. All rights reserved.</p>
+                    <div class="footer-meta">
+                        <a href="#">Privacy Protocol</a>
+                        <span class="separator">|</span>
+                        <a href="#">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+
+
+    <div id="toast-container"
+        style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.8rem;">
+    </div>
+
+    <div id="flash-messages" style="display: none;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-item" data-category="{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        window.onscroll = function () {
+            var nav = document.getElementById('navbar');
+            if (window.pageYOffset > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        };
+
+        // Initialize flashes on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const flashes = document.querySelectorAll('.flash-item');
+            flashes.forEach(f => {
+                showToast(f.innerText, f.getAttribute('data-category'));
+            });
+        });
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js').then(reg => {
+                    console.log('BINIFY PWA Registered', reg.scope);
+                }).catch(err => {
+                    console.log('BINIFY PWA Failed', err);
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

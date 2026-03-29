@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .stats-banner {
+        background-image: url("{{ url_for('static', filename='images/bg_pattern.png') }}") !important;
+        background-size: cover;
+        background-blend-mode: overlay;
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+    #cta {
+        background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url("{{ url_for('static', filename='images/hero.png') }}") !important;
+        background-size: cover;
+        background-position: center;
+    }
+    .hero-image {
+        background-image: url("{{ url_for('static', filename='images/hero_tech.png') }}") !important;
+    }
+</style>
+<section class="hero">
+    <div class="hero-content">
+        <div class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--primary); display: inline-block; margin-bottom: 2rem;">
+            <i class="fas fa-wand-magic-sparkles"></i> World's First AI Waste OS
+        </div>
+        <h1 class="text-gradient">The Future of <br>Waste Intelligence.</h1>
+        <p style="font-size: 1.3rem; line-height: 1.6; margin-bottom: 3rem; color: var(--text-muted);">
+            Empowering cities and industries with high-precision computer vision. Identify, sort, and optimize your ecological footprint in real-time with <strong>BINIFY</strong>.
+        </p>
+        <div style="display: flex; gap: 1.5rem; align-items: center;">
+            <a href="{{ url_for('dashboard') }}" class="btn-cta" style="padding: 1.2rem 2.5rem; font-size: 1.1rem;">Launch OS Portal</a>
+            <a href="#cta" style="color: var(--dark); font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+            
+                Explore the Tech <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        <div class="trust-logos" style="margin-top: 4rem;">
+            <i class="fab fa-aws"></i>
+            <i class="fab fa-google"></i>
+            <i class="fab fa-microsoft"></i>
+            <i class="fas fa-microchip"></i>
+        </div>
+    </div>
+    <div class="hero-image"></div>
+</section>
+
+<div class="stats-banner">
+    <div class="stat-item">
+        <h2>98.2%</h2>
+        <p>AI Accuracy</p>
+    </div>
+    <div class="stat-item">
+        <h2>240ms</h2>
+        <p>Inference Speed</p>
+    </div>
+    <div class="stat-item">
+        <h2>1.2M+</h2>
+        <p>Items Processed</p>
+    </div>
+    <div class="stat-item">
+        <h2>50kg</h2>
+        <p>CO2 / User Avg</p>
+    </div>
+</div>
+
+<section id="cta" style="color: white; border-radius: 60px; margin: 100px 5%; text-align: center; padding: 100px;">
+    <h2 style="font-size: 4rem; margin-bottom: 2rem; color: white;">Ready to start <br>the Revolution?</h2>
+    <p style="font-size: 1.3rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 3rem;">Join thousands of eco-innovators using BINIFY to clean the planet, one scan at a time.</p>
+    <a href="{{ url_for('register') }}" class="btn-cta" style="padding: 1.5rem 4rem; font-size: 1.2rem; background: white; color: var(--dark);">Get Started Free</a>
+</section>
+{% endblock %}

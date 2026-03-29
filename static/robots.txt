@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /static/
+Disallow: /backend/
+Disallow: /instance/
+
+Sitemap: https://binify.ai/sitemap.xml

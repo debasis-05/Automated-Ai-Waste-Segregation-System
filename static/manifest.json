@@ -1,0 +1,17 @@
+{
+  "name": "BINIFY: Smart Waste Segregator",
+  "short_name": "BINIFY",
+  "description": "Enterprise-grade AI waste classification and management system.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/static/images/hero.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

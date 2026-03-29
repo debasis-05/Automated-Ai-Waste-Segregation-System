@@ -1,0 +1,21 @@
+# BINIFY - Smart Waste Segregation System
+# Core Framework
+Flask==2.3.3
+Flask-Login==0.6.3
+Flask-Bcrypt==1.0.1
+Flask-SQLAlchemy==3.0.5
+Werkzeug==2.3.7
+SQLAlchemy==2.0.43
+
+# Production Server
+gunicorn==21.2.0
+
+# Environment Config
+python-dotenv==1.0.0
+
+# AI / Deep Learning
+torch==2.10.0
+torchvision==0.25.0
+pillow==11.0.0
+
+

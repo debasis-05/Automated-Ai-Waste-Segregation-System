@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="auth-container"
+    style="display: flex; justify-content: center; min-height: 100vh; padding: 2rem 1rem; box-sizing: border-box;">
+    <div class="auth-card"
+        style="margin: auto; background: var(--card-bg, #ffffff); padding: 2.5rem; border-radius: 1.5rem; box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1)); max-width: 450px; width: 100%; backdrop-filter: blur(10px); border: 1px solid var(--border-color, #e5e7eb);">
+        <h2
+            style="text-align: center; margin-bottom: 2rem; color: var(--text-color, #1f2937); font-size: 1.8rem; font-weight: 700;">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </h2>
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="username"
+                    style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-color, var(--text-muted));">Username</label>
+                <div class="input-wrapper" style="position: relative;">
+                    <i class="fas fa-user"
+                        style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--primary-color, #10b981);"></i>
+                    <input type="text" id="username" name="username" required autocomplete="username"
+                        placeholder="Enter your username"
+                        style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--border-color, #d1d5db); border-radius: 0.75rem; background: var(--input-bg, #f3f4f6); color: var(--text-color, #1f2937); font-family: inherit;">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="password"
+                    style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-color, var(--text-muted));">Password</label>
+                <div class="input-wrapper" style="position: relative;">
+                    <i class="fas fa-lock"
+                        style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--primary-color, #10b981);"></i>
+                    <input type="password" id="password" name="password" required autocomplete="current-password"
+                        placeholder="Enter your password"
+                        style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--border-color, #d1d5db); border-radius: 0.75rem; background: var(--input-bg, #f3f4f6); color: var(--text-color, #1f2937); font-family: inherit;">
+                </div>
+            </div>
+
+
+
+            <button type="submit"
+                style="width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--primary-color, #10b981), #059669); color: white; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4);">
+                Login
+            </button>
+        </form>
+        <div style="margin-top: 1.5rem; text-align: center;">
+            <p style="color: var(--text-muted, var(--text-muted));">Don't have an account? <a href="{{ url_for('register') }}"
+                    style="color: var(--primary-color, #10b981); font-weight: 600; text-decoration: none;">Register
+                    here</a></p>
+        </div>
+    </div>
+</div>
+</div>
+
+
+{% endblock %}
