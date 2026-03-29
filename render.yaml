@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: binify-ai
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --chdir backend app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true # Generates a secure random 32-character string
+      - key: FLASK_DEBUG
+        value: "false"
+      - key: DEFAULT_ADMIN_USER
+        value: "admin"
+      - key: DEFAULT_ADMIN_PASSWORD
+        value: "admin123"
+    disk:
+      name: binify-storage
+      mountPath: /opt/render/project/src/backend/instance
+      sizeGB: 1
