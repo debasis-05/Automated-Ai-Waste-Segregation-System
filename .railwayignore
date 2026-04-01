@@ -1,0 +1,11 @@
+backend/waste_model_trained.pth
+DATASET/
+__pycache__/
+*.pyc
+venv/
+env/
+.venv/
+*.log
+backend/instance/
+backend/uploads/
+backend/corrections.json

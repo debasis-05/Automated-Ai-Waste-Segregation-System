@@ -1,0 +1,8 @@
+[phases.install]
+cmds = [
+  "pip install -r requirements.txt",
+  "curl -L -o backend/waste_model_trained.pth 'https://media.githubusercontent.com/media/debasis-05/Automated-Ai-Waste-Segregation-System/main/backend/waste_model_trained.pth'"
+]
+
+[start]
+cmd = "gunicorn --chdir backend app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120"

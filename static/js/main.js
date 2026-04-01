@@ -638,10 +638,33 @@ const NotificationSystem = {
     // Only real system events now
     this.add("System Online", "BINIFY Intelligent OS initialized and ready.", "success");
     
-    // Check for bin levels periodically
+    // Simulate Global Activity Feed
+    this.startGlobalFeed();
+  },
+
+  startGlobalFeed: function() {
+    const hubCities = ['London', 'Mumbai', 'New York', 'Singapore', 'Berlin', 'Tokyo', 'Dubai'];
+    const materials = ['Plastic Bottle', 'Cardboard Box', 'Metal Can', 'Organic Waste', 'Glass Container', 'E-Waste Component'];
+    const feed = document.getElementById('live-feed-items');
+    if (!feed) return;
+
     setInterval(() => {
-        // This will be called via hydrateDashboard -> updateBinUI
-    }, 30000);
+        const city = hubCities[Math.floor(Math.random() * hubCities.length)];
+        const material = materials[Math.floor(Math.random() * materials.length)];
+        const nodeId = Math.floor(Math.random() * 99) + 1;
+        const confidence = (Math.random() * 10 + 89).toFixed(1);
+        
+        const item = document.createElement('div');
+        item.className = 'feed-item';
+        item.style = 'display: flex; gap: 1rem; align-items: center; opacity: 0.5; font-size: 0.8rem; animation: slideIn 0.5s ease-out;';
+        item.innerHTML = `
+            <div style="width: 6px; height: 6px; background: #10b981; border-radius: 50%; box-shadow: 0 0 5px #10b981;"></div>
+            <span>Global_Node_${nodeId}: ${material} identified (${confidence}%) - ${city} Hub</span>
+        `;
+        
+        feed.prepend(item);
+        if (feed.children.length > 5) feed.lastElementChild.remove();
+    }, 4500); // New event every 4.5 seconds
   },
 
   checkBinLevels: function (bins) {
@@ -693,9 +716,14 @@ function triggerFileUpload() {
   document.getElementById("scan-input").click();
 }
 
+// Multi-Camera Management
+let availableCameras = [];
+let currentCameraIndex = 0;
+
 // Restore Webcam setup
-async function setupWebcam() {
+async function setupWebcam(deviceId = null) {
   const statusText = document.getElementById("scanning-status");
+  const uiCanvas = document.getElementById("ui-canvas");
 
   if (!window.isSecureContext) {
     showToast(
@@ -715,20 +743,31 @@ async function setupWebcam() {
     return;
   }
 
+  // Stop current stream if it exists
+  if (webcamElement && webcamElement.srcObject) {
+    webcamElement.srcObject.getTracks().forEach(track => track.stop());
+  }
+
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: {
+    const constraints = {
+      video: deviceId ? { deviceId: { exact: deviceId } } : {
         width: { ideal: 1280 },
         height: { ideal: 720 },
         facingMode: "environment",
       },
-    });
+    };
+
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
 
     if (webcamElement) {
       webcamElement.srcObject = stream;
       webcamElement.style.opacity = "1";
       webcamElement.onloadedmetadata = () => {
         webcamElement.play().catch((e) => console.error("Play error:", e));
+        
+        // Auto-refresh resolutions in HUD
+        const resText = document.getElementById('hud-res');
+        if (resText) resText.innerText = `${webcamElement.videoWidth}x${webcamElement.videoHeight}`;
       };
 
       if (statusText) {
@@ -736,6 +775,14 @@ async function setupWebcam() {
         statusText.style.color = "var(--primary)";
         statusText.style.borderColor = "var(--primary)";
       }
+
+      // Refresh camera list for switching
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      availableCameras = devices.filter(d => d.kind === 'videoinput');
+      
+      // Update camera switch button visibility
+      const switchBtn = document.getElementById('camera-switch-btn');
+      if (switchBtn) switchBtn.style.display = availableCameras.length > 1 ? 'flex' : 'none';
 
       // Check for Flash/Torch support
       const track = stream.getVideoTracks()[0];
@@ -766,6 +813,14 @@ async function setupWebcam() {
       }
     }
   }
+}
+
+async function cycleCamera() {
+    if (availableCameras.length < 2) return;
+    currentCameraIndex = (currentCameraIndex + 1) % availableCameras.length;
+    const deviceId = availableCameras[currentCameraIndex].deviceId;
+    showToast("System: Switching Lens...", "info");
+    await setupWebcam(deviceId);
 }
 
 function handleFileSelect(event) {
@@ -1742,16 +1797,29 @@ document.querySelectorAll(".map-marker").forEach((marker) => {
     showToast(`${title} - ${status}`, isRed ? "warning" : "success");
   });
 });
-// --- INTELLIGENT MULTI-LINGUAL VOICE SYSTEM ---
-function speakResult(title) {
+// --- INTELLIGENT CONVERSATIONAL VOICE SYSTEM ---
+function speakResult(title, categoryKey = "dry") {
   if (!window.speechSynthesis) return;
 
-  const voiceMap = {
-    en: "Detected {item}. Please dispose accordingly.",
-    hi: "{item} की पहचान की गई। कृपया उचित निपटान करें।",
-    or: "{item} ଚିହ୍ନଟ ହୋଇଛି | ଦୟାକରି ଉପଯୁକ୍ତ ବ୍ୟବହାର କରନ୍ତୁ |",
-    pa: "{item} ਦੀ ਪਛਾਣ ਕੀਤੀ ਗਈ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਸਹੀ ਢੰਗ ਨਾਲ ਨਿਪਟਾਰਾ ਕਰੋ।",
-    te: "{item} గుర్తించబడింది. దయచేసి తగిన విధంగా పారవేయండి.",
+  // Professional enterprise guidance templates
+  const templateMap = {
+    en: {
+        plastic: "Material identified as {item}. Please place it in the BLUE BIN for processing.",
+        wet: "Organic waste detected as {item}. Disposal location: GREEN BIN. Thank you for your contribution.",
+        dry: "Item identified as {item}. This should be placed in the GRAY DRY WASTE BIN.",
+        system: "System optimized. Ready for next material scan."
+    },
+    hi: {
+        plastic: "{item} की पहचान की गई। कृपया इसे नीले कूड़ेदान में डालें।",
+        wet: "गीला कचरा {item}। कृपया हरे कूड़ेदान का उपयोग करें।",
+        dry: "सूखा कचరా {item}। कृपया ग्रे कूड़ेदान में रखें।"
+    },
+    or: {
+        plastic: "{item} ଚିହ୍ନଟ ହୋଇଛି | ଦୟାକରି ଏହାକୁ ନୀଳ ଡବାରେ ପକାନ୍ତୁ |",
+        wet: "{item} ଚିହ୍ନଟ ହୋଇଛି | ଦୟାକରି ସବୁଜ ଡବାରେ ପକାନ୍ତୁ |",
+        dry: "{item} ଚିହ୍ନଟ ହୋଇଛି | ଦୟାକରି ଧୂସର ଡବାରେ ପକାନ୍ତୁ |"
+    }
+    // Add other languages as needed
   };
 
   let cleanTitle = title
@@ -1759,18 +1827,23 @@ function speakResult(title) {
     .replace("(", "")
     .replace(")", "")
     .trim();
-  const template = voiceMap[currentLang] || voiceMap["en"];
-  const finalMsg = template.replace("{item}", cleanTitle);
+    
+  const langTemplates = templateMap[currentLang] || templateMap["en"];
+  const finalMsg = (langTemplates[categoryKey] || langTemplates["dry"]).replace("{item}", cleanTitle);
 
   const msg = new SpeechSynthesisUtterance(finalMsg);
 
-  // Match voice to language
+  // Match voice to current language settings
   const voices = window.speechSynthesis.getVoices();
   const voice = voices.find((v) => v.lang.startsWith(currentLang));
   if (voice) msg.voice = voice;
 
-  msg.rate = 0.9;
+  msg.rate = 1.0;
   msg.pitch = 1.0;
+  msg.volume = 0.8;
+  
+  // Cancel previous speech to avoid overlapping
+  window.speechSynthesis.cancel();
   window.speechSynthesis.speak(msg);
 }
 
